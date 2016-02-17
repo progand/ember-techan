@@ -1,1 +1,1 @@
-export { default } from 'ember-techan-js/components/candlestick-chart/component';
+export { default } from 'ember-techan/components/candlestick-chart/component';

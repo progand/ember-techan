@@ -1,1 +1,1 @@
-export { default } from 'ember-techan-js/components/volume-chart/component';
+export { default } from 'ember-techan/components/volume-chart/component';

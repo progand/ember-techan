@@ -1,1 +1,1 @@
-export { default } from 'ember-techan-js/components/ohlc-chart/component';
+export { default } from 'ember-techan/components/ohlc-chart/component';

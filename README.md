@@ -1,4 +1,4 @@
-# Ember-techan-js
+# Ember-techan
 
 This README outlines the details of collaborating on this Ember addon.
 

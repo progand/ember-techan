@@ -1,1 +1,1 @@
-export { default } from 'ember-techan-js/components/feed-chart/component';
+export { default } from 'ember-techan/components/feed-chart/component';

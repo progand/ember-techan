@@ -1,1 +1,1 @@
-export { default } from 'ember-techan-js/components/all-plots/component';
+export { default } from 'ember-techan/components/all-plots/component';

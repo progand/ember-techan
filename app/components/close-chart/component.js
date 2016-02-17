@@ -1,1 +1,1 @@
-export { default } from 'ember-techan-js/components/close-chart/component';
+export { default } from 'ember-techan/components/close-chart/component';
