@@ -4,6 +4,7 @@ import BaseChart from '../../base-chart';
 
 export default BaseChart.extend({
   layout: layout,
+  storage: Ember.inject.service('techan-storage'),
   candlestick: Ember.computed(function() {
     return techan.plot.candlestick()
       .xScale(this.get('x'))
@@ -18,9 +19,6 @@ export default BaseChart.extend({
     return techan.plot.volume()
       .xScale(this.get('x'))
       .yScale(yVolume);
-  }),
-  zoom: Ember.computed(function () {
-    return d3.behavior.zoom().on('zoom', () => this.send('redraw'));
   }),
   ohlcAnnotation: Ember.computed(function() {
     return techan.plot.axisannotation()
@@ -40,10 +38,7 @@ export default BaseChart.extend({
       .xScale(this.get('x'))
       .yScale(this.get('y'))
       .xAnnotation(this.get('timeAnnotation'))
-      .yAnnotation(this.get('ohlcAnnotation'))
-      .on('enter', () => this.send('enter'))
-      .on('out', () => this.send('out'))
-      .on('move', function() { self.send('move', ...arguments); });
+      .yAnnotation(this.get('ohlcAnnotation'));
   }),
   didInsertElement() {
     this._super(...arguments);
@@ -53,6 +48,7 @@ export default BaseChart.extend({
     const height = this.get('height');
     const x = this.get('x');
     const y = this.get('y');
+    const yVolume = this.get('yVolume');
     const accessor = candlestick.accessor();
     svg.append('clipPath')
       .attr('id', 'clip')
@@ -68,7 +64,8 @@ export default BaseChart.extend({
       .attr("x", width - 5)
       .attr("y", 15));
 
-    const data = this.get('mappedData').sort(function(a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
+    const data = this.get('mappedData')
+      .sort(function(a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
 
     svg.append('g').datum(data).attr('class', 'candlestick').attr('clip-path', 'url(#clip)');
     svg.append('g').datum(data).attr('class', 'volume').attr('clip-path', 'url(#clip)');
@@ -84,77 +81,36 @@ export default BaseChart.extend({
       .style('text-anchor', 'end')
       .text('Price ($)');
 
-    svg.append('rect')
-      .attr('class', 'pane')
-      .attr('width', width)
-      .attr('height', height)
-      .call(this.get('zoom'));
-
     this.send('redraw');
 
-    this.get('zoom').x(x.zoomable().clamp(false)).y(y);
+    this.get('storage').on('newItem', (item) => {
+      const dataFromStore = this.get('mappedData');
+      dataFromStore.shift();
+      dataFromStore.push(item);
+      this.set('mappedData', dataFromStore);
+      svg.select('g.candlestick').datum(dataFromStore);
+      svg.select('g.volume').datum(dataFromStore);
+      x.domain(dataFromStore.map(accessor.d));
+      y.domain(techan.scale.plot.ohlc(dataFromStore, accessor).domain());
+      yVolume.domain(techan.scale.plot.volume(dataFromStore).domain());
 
-    setInterval(() => {
-      const item = data[Math.floor(Math.random() * data.length)];
-
-      data.push({
-        date: new Date(),
-        open: +item.open,
-        high: +item.high,
-        low: +item.low,
-        close: +item.close,
-        volume: +item.volume
-      });
-      this.set('mappedData', data);
-      this.send('redraw');
-    }, 1000);
-
+      this.send('redraw')
+    });
   },
   actions: {
     redraw() {
       const candlestick = this.get('candlestick');
       const crosshair = this.get('crosshair');
       const volume = this.get('volume');
-      const yVolume = this.get('yVolume');
-      const data = this.get('mappedData');
       const svg = this.get('svg');
       const yAxis = this.get('yAxis');
       const xAxis = this.get('xAxis');
-      const x = this.get('x');
-      const y = this.get('y');
-      const accessor = candlestick.accessor();
-
-      x.domain(data.map(accessor.d));
-      y.domain(techan.scale.plot.ohlc(data, accessor).domain());
-      yVolume.domain(techan.scale.plot.volume(data).domain());
 
       svg.select('g.candlestick').call(candlestick);
-      svg.append('g').attr("class", "crosshair").call(crosshair);
+      svg.select('g.crosshair').call(crosshair);
       svg.select('g.volume').call(volume);
       svg.select('g.y.axis').call(yAxis);
       svg.select('g.x.axis').call(xAxis);
-    },
-    enter() {
-      const coordsText = this.get('coordsText');
-      coordsText.style("display", "inline");
-      this.set('coordsText', coordsText);
-    },
-    move(coords) {
-      const coordsText = this.get('coordsText');
-      const timeAnnotation = this.get('timeAnnotation');
-      const ohlcAnnotation = this.get('ohlcAnnotation');
-      coordsText.text(
-        timeAnnotation.format()(coords[0]) + ", " + ohlcAnnotation.format()(coords[1])
-      );
-      this.set('coordsText', coordsText);
-    },
-    out() {
-      const coordsText = this.get('coordsText');
-      coordsText.style("display", "none");
-      this.set('coordsText', coordsText);
-    },
-    click(coords) {
-      alert(coords);
     }
 
   }

@@ -4,6 +4,7 @@ export default Ember.Component.extend({
   identificator: null,
   baseWidth: 960,
   baseHeight: 500,
+  data: [],
   margin: {
     top: 20, right: 20, bottom: 30, left: 50
   },

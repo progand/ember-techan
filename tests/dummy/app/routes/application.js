@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
+  storage: Ember.inject.service('techan-storage'),
   model() {
     const data = [
       {date: "9-Jun-14", open: 62.40, high: 63.34, low: 61.79,close: 62.88,volume: 37617413},
@@ -281,5 +282,24 @@ export default Ember.Route.extend({
       trades: trades,
       trendlineData: trendlineData
     };
+  },
+  afterModel(model) {
+    const store = this.get('storage');
+
+    let i = 0;
+    setInterval(() => {
+      if (i > model.data.length) {
+        i = 0;
+      }
+      store.addItem({
+        date: new Date(),
+        open: model.data[i].open,
+        high: model.data[i].high,
+        low: model.data[i].low,
+        close: model.data[i].close,
+        volume: model.data[i].volume
+      });
+      i++;
+    }, 3000);
   }
 })
