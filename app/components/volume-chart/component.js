@@ -1,0 +1,1 @@
+export { default } from 'ember-techan-js/components/volume-chart/component';

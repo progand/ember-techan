@@ -1,0 +1,1 @@
+export { default } from 'ember-techan-js/components/all-plots/component';

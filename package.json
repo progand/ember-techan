@@ -1,6 +1,6 @@
 {
   "name": "ember-techan-js",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The default blueprint for ember-cli addons.",
   "directories": {
     "doc": "doc",
@@ -38,9 +38,13 @@
     "ember-try": "~0.0.8"
   },
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "techan",
+    "techan.js",
+    "d3"
   ],
   "dependencies": {
+    "ember-cli-htmlbars": "^1.0.1",
     "ember-cli-babel": "^5.1.5"
   },
   "ember-addon": {
