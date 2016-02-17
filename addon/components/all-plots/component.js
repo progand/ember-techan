@@ -51,15 +51,15 @@ export default Ember.Component.extend({
     return this.get('y').copy();
   }),
   yVolume: Ember.computed('y', function () {
-    let y = this.get('y');
+    const y = this.get('y');
     return d3.scale.linear().range([y(0), y(0.2)]);
   }),
   candlestick: Ember.computed('x', 'y', function () {
     return techan.plot.candlestick().xScale(this.get('x')).yScale(this.get('y'));
   }),
   tradearrow: Ember.computed('x', 'y', function () {
-    let x = this.get('x');
-    let y = this.get('y');
+    const x = this.get('x');
+    const y = this.get('y');
     return techan.plot.tradearrow()
       .xScale(x)
       .yScale(y)
@@ -113,14 +113,14 @@ export default Ember.Component.extend({
       .orient('right');
   }),
   ohlcAnnotation: Ember.computed('x', 'yAxis', function () {
-    let x = this.get('x');
+    const x = this.get('x');
     return techan.plot.axisannotation()
       .axis(this.get('yAxis'))
       .format(d3.format(',.2fs'))
       .translate([x(1), 0]);
   }),
   closeAnnotation: Ember.computed('x', 'yAxis', 'candlestick', function () {
-    let x = this.get('x');
+    const x = this.get('x');
     return techan.plot.axisannotation()
       .axis(this.get('yAxis'))
       .accessor(this.get('candlestick').accessor())
@@ -149,12 +149,12 @@ export default Ember.Component.extend({
       .width(35);
   }),
   macdScale: Ember.computed('indicatorTop', 'dim.indicator.height', function () {
-    let indicatorTop = this.get('indicatorTop');
+    const indicatorTop = this.get('indicatorTop');
     return d3.scale.linear()
       .range([indicatorTop(0) + this.get('dim.indicator.height'), indicatorTop(0)]);
   }),
   rsiScale: Ember.computed('indicatorTop', 'macdScale', 'dim.indicator.height', function () {
-    let indicatorTop = this.get('indicatorTop');
+    const indicatorTop = this.get('indicatorTop');
     return this.get('macdScale').copy()
       .range([indicatorTop(1) + this.get('dim.indicator.height'), indicatorTop(1)]);
   }),
@@ -168,7 +168,7 @@ export default Ember.Component.extend({
       .orient('right');
   }),
   macdAnnotation: Ember.computed('x', 'macdAxis', function () {
-    let x = this.get('x');
+    const x = this.get('x');
     return techan.plot.axisannotation()
       .axis(this.get('macdAxis'))
       .format(d3.format(',.2fs'))
@@ -197,7 +197,7 @@ export default Ember.Component.extend({
       .orient('right');
   }),
   rsiAnnotation: Ember.computed('x', 'rsiAxis', function () {
-    let x = this.get('x');
+    const x = this.get('x');
     return techan.plot.axisannotation()
       .axis(this.get('rsiAxis'))
       .format(d3.format(',.2fs'))
@@ -215,10 +215,10 @@ export default Ember.Component.extend({
       .format(d3.format(',.2fs'));
   }),
   ohlcCrosshair: Ember.computed('timeAnnotation', 'ohlcAnnotation', 'percentAnnotation', 'volumeAnnotation', 'plotHeight', function () {
-    let timeAnnotation = this.get('timeAnnotation');
-    let ohlcAnnotation = this.get('ohlcAnnotation');
-    let percentAnnotation = this.get('percentAnnotation');
-    let volumeAnnotation = this.get('volumeAnnotation');
+    const timeAnnotation = this.get('timeAnnotation');
+    const ohlcAnnotation = this.get('ohlcAnnotation');
+    const percentAnnotation = this.get('percentAnnotation');
+    const volumeAnnotation = this.get('volumeAnnotation');
     return techan.plot.crosshair()
       .xScale(timeAnnotation.axis().scale())
       .yScale(ohlcAnnotation.axis().scale())
@@ -227,9 +227,9 @@ export default Ember.Component.extend({
       .verticalWireRange([0, this.get('plotHeight')]);
   }),
   macdCrosshair: Ember.computed('timeAnnotation', 'macdAnnotation', 'macdAnnotationLeft', 'plotHeight', function () {
-    let timeAnnotation = this.get('timeAnnotation');
-    let macdAnnotation = this.get('macdAnnotation');
-    let macdAnnotationLeft = this.get('macdAnnotationLeft');
+    const timeAnnotation = this.get('timeAnnotation');
+    const macdAnnotation = this.get('macdAnnotation');
+    const macdAnnotationLeft = this.get('macdAnnotationLeft');
     return techan.plot.crosshair()
       .xScale(timeAnnotation.axis().scale())
       .yScale(macdAnnotation.axis().scale())
@@ -238,9 +238,9 @@ export default Ember.Component.extend({
       .verticalWireRange([0, this.get('plotHeight')]);
   }),
   rsiCrosshair: Ember.computed('timeAnnotation', 'rsiAnnotation', 'rsiAnnotationLeft', 'plotHeight', function () {
-    let timeAnnotation = this.get('timeAnnotation');
-    let rsiAnnotation = this.get('rsiAnnotation');
-    let rsiAnnotationLeft = this.get('rsiAnnotationLeft');
+    const timeAnnotation = this.get('timeAnnotation');
+    const rsiAnnotation = this.get('rsiAnnotation');
+    const rsiAnnotationLeft = this.get('rsiAnnotationLeft');
     return techan.plot.crosshair()
       .xScale(timeAnnotation.axis().scale())
       .yScale(rsiAnnotation.axis().scale())
@@ -254,44 +254,44 @@ export default Ember.Component.extend({
   },
 
   didInsertElement() {
-    let baseWidth = this.get('baseWidth');
-    let baseHeight = this.get('baseHeight');
-    let dim = this.get('dim');
-    let plotWidth = this.get('plotWidth');
-    let plotHeight = this.get('plotHeight');
-    let indicatorTop = this.get('indicatorTop');
-    let x = this.get('x');
-    let candlestick = this.get('candlestick');
-    let y = this.get('y');
-    let yPercent = this.get('yPercent');
-    let yVolume = this.get('yVolume');
-    let macdScale = this.get('macdScale');
-    let rsiScale = this.get('rsiScale');
-    let closeAnnotation = this.get('closeAnnotation');
-    let volume = this.get('volume');
-    let sma0 = this.get('sma0');
-    let sma1 = this.get('sma1');
-    let ema2 = this.get('ema2');
-    let macd = this.get('macd');
-    let rsi = this.get('rsi');
-    let ohlcCrosshair = this.get('ohlcCrosshair');
-    let macdCrosshair = this.get('macdCrosshair');
-    let rsiCrosshair = this.get('rsiCrosshair');
-    let trendline = this.get('trendline');
-    let supstance = this.get('supstance');
-    let supstanceData = this.get('supstanceValues');
-    let tradearrow = this.get('tradearrow');
-    let zoom = this.get('zoom');
-    let zoomPercent = this.get('zoomPercent');
-    let parseDate = this.get('parseDate');
-    let trades = this.get('trades');
-    let trendlineData = this.get('trendlineData');
+    const baseWidth = this.get('baseWidth');
+    const baseHeight = this.get('baseHeight');
+    const dim = this.get('dim');
+    const plotWidth = this.get('plotWidth');
+    const plotHeight = this.get('plotHeight');
+    const indicatorTop = this.get('indicatorTop');
+    const x = this.get('x');
+    const candlestick = this.get('candlestick');
+    const y = this.get('y');
+    const yPercent = this.get('yPercent');
+    const yVolume = this.get('yVolume');
+    const macdScale = this.get('macdScale');
+    const rsiScale = this.get('rsiScale');
+    const closeAnnotation = this.get('closeAnnotation');
+    const volume = this.get('volume');
+    const sma0 = this.get('sma0');
+    const sma1 = this.get('sma1');
+    const ema2 = this.get('ema2');
+    const macd = this.get('macd');
+    const rsi = this.get('rsi');
+    const ohlcCrosshair = this.get('ohlcCrosshair');
+    const macdCrosshair = this.get('macdCrosshair');
+    const rsiCrosshair = this.get('rsiCrosshair');
+    const trendline = this.get('trendline');
+    const supstance = this.get('supstance');
+    const supstanceData = this.get('supstanceValues');
+    const tradearrow = this.get('tradearrow');
+    const zoom = this.get('zoom');
+    const zoomPercent = this.get('zoomPercent');
+    const parseDate = this.get('parseDate');
+    const trades = this.get('trades');
+    const trendlineData = this.get('trendlineData');
 
-    let svg = d3.select('#' + this.get('identificator'))
+    const svg = d3.select('#' + this.get('identificator'))
       .attr('width', baseWidth)
       .attr('height', baseHeight);
 
-    let defs = svg.append('defs');
+    const defs = svg.append('defs');
 
     defs.append('clipPath')
       .attr('id', 'ohlcClip')
@@ -315,14 +315,11 @@ export default Ember.Component.extend({
       .attr('width', plotWidth)
       .attr('height', dim.indicator.height);
 
-    svg = svg.append('g')
-      .attr('transform', 'translate(' + dim.margin.left + ',' + dim.margin.top + ')');
-
     svg.append('g')
       .attr('class', 'x axis')
       .attr('transform', 'translate(0,' + plotHeight + ')');
 
-    let ohlcSelection = svg.append('g')
+    const ohlcSelection = svg.append('g')
       .attr('class', 'ohlc')
       .attr('transform', 'translate(0,0)');
 
@@ -365,7 +362,7 @@ export default Ember.Component.extend({
     ohlcSelection.append('g')
       .attr('class', 'volume axis');
 
-    let indicatorSelection = svg.selectAll('svg > g.indicator').data(['macd', 'rsi']).enter()
+    const indicatorSelection = svg.selectAll('svg > g.indicator').data(['macd', 'rsi']).enter()
       .append('g')
       .attr('class', function (d) {
         return d + ' indicator';
@@ -406,10 +403,10 @@ export default Ember.Component.extend({
       .attr('class', 'supstances analysis')
       .attr('clip-path', 'url(#ohlcClip)');
 
-    let accessor = candlestick.accessor(),
+    const accessor = candlestick.accessor(),
       indicatorPreRoll = 0;  // Don't show where indicators don't have data
 
-    let data = this.get('data').map(function (d) {
+    const data = this.get('data').map(function (d) {
       return {
         date: parseDate(d.date),
         open: +d.open,
@@ -427,9 +424,9 @@ export default Ember.Component.extend({
     yPercent.domain(techan.scale.plot.percent(y, accessor(data[indicatorPreRoll])).domain());
     yVolume.domain(techan.scale.plot.volume(data).domain());
 
-    let macdData = techan.indicator.macd()(data);
+    const macdData = techan.indicator.macd()(data);
     macdScale.domain(techan.scale.plot.macd(macdData).domain());
-    let rsiData = techan.indicator.rsi()(data);
+    const rsiData = techan.indicator.rsi()(data);
     rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
 
     svg.select('g.candlestick').datum(data).call(candlestick);
@@ -449,7 +446,7 @@ export default Ember.Component.extend({
 
     svg.select("g.tradearrow").datum(trades).call(tradearrow);
 
-    let zoomable = x.zoomable();
+    const zoomable = x.zoomable();
     zoomable.domain([indicatorPreRoll, data.length]); // Zoom in a little to hide indicator preroll
     this.set('svg', svg);
 
@@ -461,31 +458,31 @@ export default Ember.Component.extend({
   },
   actions: {
     draw() {
-      let svg = this.get('svg');
-      let zoomPercent = this.get('zoomPercent');
-      let zoom = this.get('zoom');
-      let xAxis = this.get('xAxis');
-      let yAxis = this.get('yAxis');
-      let volumeAxis = this.get('volumeAxis');
-      let percentAxis = this.get('percentAxis');
-      let macdAxis = this.get('macdAxis');
-      let rsiAxis = this.get('rsiAxis');
-      let macdAxisLeft = this.get('macdAxisLeft');
-      let rsiAxisLeft = this.get('rsiAxisLeft');
-      let candlestick = this.get('candlestick');
-      let closeAnnotation = this.get('closeAnnotation');
-      let volume = this.get('volume');
-      let sma0 = this.get('sma0');
-      let sma1 = this.get('sma1');
-      let ema2 = this.get('ema2');
-      let macd = this.get('macd');
-      let rsi = this.get('rsi');
-      let ohlcCrosshair = this.get('ohlcCrosshair');
-      let macdCrosshair = this.get('macdCrosshair');
-      let rsiCrosshair = this.get('rsiCrosshair');
-      let trendline = this.get('trendline');
-      let supstance = this.get('supstance');
-      let tradearrow = this.get('tradearrow');
+      const svg = this.get('svg');
+      const zoomPercent = this.get('zoomPercent');
+      const zoom = this.get('zoom');
+      const xAxis = this.get('xAxis');
+      const yAxis = this.get('yAxis');
+      const volumeAxis = this.get('volumeAxis');
+      const percentAxis = this.get('percentAxis');
+      const macdAxis = this.get('macdAxis');
+      const rsiAxis = this.get('rsiAxis');
+      const macdAxisLeft = this.get('macdAxisLeft');
+      const rsiAxisLeft = this.get('rsiAxisLeft');
+      const candlestick = this.get('candlestick');
+      const closeAnnotation = this.get('closeAnnotation');
+      const volume = this.get('volume');
+      const sma0 = this.get('sma0');
+      const sma1 = this.get('sma1');
+      const ema2 = this.get('ema2');
+      const macd = this.get('macd');
+      const rsi = this.get('rsi');
+      const ohlcCrosshair = this.get('ohlcCrosshair');
+      const macdCrosshair = this.get('macdCrosshair');
+      const rsiCrosshair = this.get('rsiCrosshair');
+      const trendline = this.get('trendline');
+      const supstance = this.get('supstance');
+      const tradearrow = this.get('tradearrow');
 
       zoomPercent.translate(zoom.translate());
       zoomPercent.scale(zoom.scale());
@@ -514,7 +511,7 @@ export default Ember.Component.extend({
       svg.select('g.tradearrow').call(tradearrow.refresh);
     },
     reset() {
-      let zoom = this.get('zoom');
+      const zoom = this.get('zoom');
       zoom.scale(1);
       zoom.translate([0, 0]);
       this.send('draw');
