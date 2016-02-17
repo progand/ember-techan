@@ -5,7 +5,7 @@ export default Ember.Service.extend(Ember.Evented, {
   addItem(item) {
     let data = this.get('data');
     if (data.length > 250) {
-      data = data.slice(data.length-250, data.length);
+      data.shift();
     }
     data.push(item);
     this.set('data', data);
@@ -17,9 +17,6 @@ export default Ember.Service.extend(Ember.Evented, {
     items.forEach((item) => {
       data.push(item);
     })
-    if (data.length > 250) {
-      data = data.slice(data.length-249, data.length);
-    }
     this.set('data', data);
     this.trigger('newItem');
   }

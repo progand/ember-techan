@@ -83,9 +83,6 @@ export default BaseChart.extend({
 
     this.get('storage').on('newItem', () => {
       let dataFromStore = this.get('storage').get('data');
-      if (dataFromStore.length > 250) {
-        dataFromStore = dataFromStore.slice(data.length - 249, data.length);
-      }
 
       svg.select('g.candlestick').datum(dataFromStore);
       svg.select('g.volume').datum(dataFromStore);
