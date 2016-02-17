@@ -97,16 +97,17 @@ export default BaseChart.extend({
     });
     const predefinedData = this.get('data');
     if (predefinedData instanceof Array || predefinedData.length > 0) {
-      predefinedData.forEach((item) => {
-        this.get('storage').addItem({
+      this.get('storage').addItems(predefinedData.map((item) => {
+        return {
           date: parseDate(item.date),
           open: +item.open,
           high: +item.high,
           low: +item.low,
           close: +item.close,
           volume: +item.volume
-        });
+        }
       })
+      );
     }
   },
   actions: {

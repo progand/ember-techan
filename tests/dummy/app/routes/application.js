@@ -300,6 +300,6 @@ export default Ember.Route.extend({
         volume: model.data[i].volume
       });
       i++;
-    }, 50);
+    }, 1000);
   }
 })
