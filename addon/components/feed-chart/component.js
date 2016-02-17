@@ -4,6 +4,7 @@ import BaseChart from '../../base-chart';
 
 export default BaseChart.extend({
   layout: layout,
+  yAxisText: "",
   storage: Ember.inject.service('techan-storage'),
   candlestick: Ember.computed(function() {
     return techan.plot.candlestick()
@@ -28,7 +29,7 @@ export default BaseChart.extend({
   timeAnnotation: Ember.computed(function() {
     return techan.plot.axisannotation()
       .axis(this.get('xAxis'))
-      .format(d3.time.format('%Y-%m-%d'))
+      .format(d3.time.format('%Y-%m-%d %H:%M:%S'))
       .width(65)
       .translate([0, this.get('height')]);
   }),
@@ -49,7 +50,11 @@ export default BaseChart.extend({
     const x = this.get('x');
     const y = this.get('y');
     const yVolume = this.get('yVolume');
+    const crosshair = this.get('crosshair');
+    const parseDate = this.get('parseDate');
     const accessor = candlestick.accessor();
+    const data = this.get('storage').get('data');
+
     svg.append('clipPath')
       .attr('id', 'clip')
       .append('rect')
@@ -57,15 +62,6 @@ export default BaseChart.extend({
       .attr('y', y(1))
       .attr('width', width)
       .attr('height', y(0) - y(1));
-
-    this.set('coordsText', svg.append('text')
-      .style("text-anchor", "end")
-      .attr("class", "coords")
-      .attr("x", width - 5)
-      .attr("y", 15));
-
-    const data = this.get('mappedData')
-      .sort(function(a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
 
     svg.append('g').datum(data).attr('class', 'candlestick').attr('clip-path', 'url(#clip)');
     svg.append('g').datum(data).attr('class', 'volume').attr('clip-path', 'url(#clip)');
@@ -79,15 +75,18 @@ export default BaseChart.extend({
       .attr('y', 6)
       .attr('dy', '.71em')
       .style('text-anchor', 'end')
-      .text('Price ($)');
+      .text(this.get('yAxisText'));
+
+    svg.append('g').attr("class", "crosshair").call(crosshair);
 
     this.send('redraw');
 
-    this.get('storage').on('newItem', (item) => {
-      const dataFromStore = this.get('mappedData');
-      dataFromStore.shift();
-      dataFromStore.push(item);
-      this.set('mappedData', dataFromStore);
+    this.get('storage').on('newItem', () => {
+      let dataFromStore = this.get('storage').get('data');
+      if (dataFromStore.length > 250) {
+        dataFromStore = dataFromStore.slice(data.length - 249, data.length);
+      }
+
       svg.select('g.candlestick').datum(dataFromStore);
       svg.select('g.volume').datum(dataFromStore);
       x.domain(dataFromStore.map(accessor.d));
@@ -96,6 +95,19 @@ export default BaseChart.extend({
 
       this.send('redraw')
     });
+    const predefinedData = this.get('data');
+    if (predefinedData instanceof Array || predefinedData.length > 0) {
+      predefinedData.forEach((item) => {
+        this.get('storage').addItem({
+          date: parseDate(item.date),
+          open: +item.open,
+          high: +item.high,
+          low: +item.low,
+          close: +item.close,
+          volume: +item.volume
+        });
+      })
+    }
   },
   actions: {
     redraw() {

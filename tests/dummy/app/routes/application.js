@@ -288,7 +288,7 @@ export default Ember.Route.extend({
 
     let i = 0;
     setInterval(() => {
-      if (i > model.data.length) {
+      if (i > model.data.length - 1) {
         i = 0;
       }
       store.addItem({
@@ -300,6 +300,6 @@ export default Ember.Route.extend({
         volume: model.data[i].volume
       });
       i++;
-    }, 3000);
+    }, 50);
   }
 })
