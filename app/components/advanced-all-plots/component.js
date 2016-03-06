@@ -1,0 +1,1 @@
+export { default } from 'ember-techan/components/advanced-all-plots/component';
