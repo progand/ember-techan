@@ -108,6 +108,22 @@ export default Ember.Component.extend({
 
     this.set('svg', svg);
     this.draw();
+    
+    this.updatePlotWidth = () => {
+      Ember.run.bind(this, Ember.run.throttle(this, function () {
+        let width = this.$().width();
+        this.set('width', width);
+        this.get('svg').attr('width', width);
+        this.actions.redraw.apply(this, ...arguments);
+      }, 150));
+    }
+    Ember.$(window).on('resize', this.updatePlotWidth);
+    this.updatePlotWidth();
+  },
+  willDestroyElement() {
+    this._super(...arguments);
+    Ember.$(window).off('resize', this.updatePlotWidth);
+    this.updatePlotWidth = null;
   },
   isIndicatorEnable(indicatorName) {
     return $.inArray(indicatorName, this.get('enabledIndicators')) !== -1;
