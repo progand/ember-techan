@@ -111,7 +111,9 @@ export default Ember.Component.extend({
     
     this.updatePlotWidth = () => {
       Ember.run.bind(this, Ember.run.throttle(this, function () {
-        this.set('width', this.$().width());
+        let width = this.$().width();
+        this.set('width', width);
+        this.get('svg').attr('width', width);
         this.actions.redraw.apply(this, ...arguments);
       }, 150));
     }
