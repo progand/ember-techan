@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/dbsparkle-team/ember-techan/tree/master.svg?style=svg)](https://circleci.com/gh/dbsparkle-team/ember-techan/tree/master)
+
 # Ember-techan
 
 This README outlines the details of collaborating on this Ember addon.
