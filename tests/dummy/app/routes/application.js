@@ -275,16 +275,19 @@ export default Ember.Route.extend({
       { start: { date: new Date(2014, 2, 11), value: 72.50 }, end: { date: new Date(2014, 5, 9), value: 63.34 } },
       { start: { date: new Date(2013, 10, 21), value: 43 }, end: { date: new Date(2014, 2, 17), value: 70.50 } }
     ];
+    const width = window.screen.availWidth * 0.49;
     return {
       data: data,
+      width: width,
       closeValues: closeValues,
       supstanceValues: supstanceValues,
       trades: trades,
       trendlineData: trendlineData
     };
   },
-  afterModel(model) {
+  afterModel(model, transition) {
     const store = this.get('storage');
+    model.currentUrl = Ember.get(transition, 'targetName');
 
     let i = 0;
     setInterval(() => {
@@ -300,6 +303,6 @@ export default Ember.Route.extend({
         volume: model.data[i].volume
       });
       i++;
-    }, 1000);
+    }, 100);
   }
 })

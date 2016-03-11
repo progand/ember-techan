@@ -17,6 +17,9 @@ export default Ember.Component.extend({
   macd: true,
   rsi: true,
   ichimoku: false,
+  sma0: false,
+  sma1: false,
+  ema2: false,
   resetSelector: '.reset',
   allIndicators: { //  edit if u add new indicator
     'macd': {
@@ -27,9 +30,19 @@ export default Ember.Component.extend({
     },
     'ichimoku': {
       'separateClip': false
-    }
+    },
+    'sma0': {
+      'separateClip': false
+    },
+    'sma1': {
+      'separateClip': false
+    },
+    'ema2': {
+      'separateClip': false
+    },
+
   },
-  enabledIndicators: Ember.computed('macd', 'rsi', 'ichimoku', function() { //  edit if u add new indicator
+  enabledIndicators: Ember.computed('macd', 'rsi', 'ichimoku', 'sma0', 'sma1', 'ema2', function() { //  edit if u add new indicator
     const allIndicators = this.get('allIndicators');
     let enabledIndicators = [];
     for (let indicatorName in allIndicators) {
@@ -108,13 +121,13 @@ export default Ember.Component.extend({
 
     this.set('svg', svg);
     this.draw();
-    
+
     this.updatePlotWidth = () => {
       Ember.run.bind(this, Ember.run.throttle(this, function () {
         let width = this.$().width();
         this.set('width', width);
         this.get('svg').attr('width', width);
-        this.actions.redraw.apply(this, ...arguments);
+        this.sendAction('redraw');
       }, 150));
     }
     Ember.$(window).on('resize', this.updatePlotWidth);
@@ -136,6 +149,9 @@ export default Ember.Component.extend({
     const isRsi = this.isIndicatorEnable('rsi');
     const isMacd = this.isIndicatorEnable('macd');
     const isIchimoku = this.isIndicatorEnable('ichimoku');
+    const isSma0 = this.isIndicatorEnable('sma0');
+    const isSma1 = this.isIndicatorEnable('sma1');
+    const isEma2 = this.isIndicatorEnable('ema2');
     const dim = this.get('dim');
     const component = this;
 
@@ -202,26 +218,18 @@ export default Ember.Component.extend({
 
     const yAxis = d3.svg.axis()
       .scale(y)
-      .orient("right");
+      .orient("left");
 
     const chartAnnotation = techan.plot.axisannotation()
       .axis(yAxis)
       .format(d3.format(',.2fs'))
-      .translate([x(1), 0]);
+      .translate([x(0), 0]);
 
     const closeAnnotation = techan.plot.axisannotation()
       .axis(yAxis)
       .accessor(chart.accessor())
       .format(d3.format(',.2fs'))
-      .translate([x(1), 0]);
-
-    const percentAxis = d3.svg.axis()
-      .scale(yPercent)
-      .orient("left")
-      .tickFormat(d3.format('+.1%'));
-
-    const percentAnnotation = techan.plot.axisannotation()
-      .axis(percentAxis);
+      .translate([x(0), 0]);
 
     const volumeAxis = d3.svg.axis()
       .scale(yVolume)
@@ -235,7 +243,6 @@ export default Ember.Component.extend({
 
     let macdScale;
     let macd;
-    let macdAxis;
     let macdAnnotation;
     let macdAxisLeft;
     let macdAnnotationLeft;
@@ -250,16 +257,6 @@ export default Ember.Component.extend({
         .xScale(x)
         .yScale(macdScale);
 
-      macdAxis = d3.svg.axis()
-        .scale(macdScale)
-        .ticks(3)
-        .orient("right");
-
-      macdAnnotation = techan.plot.axisannotation()
-        .axis(macdAxis)
-        .format(d3.format(',.2fs'))
-        .translate([x(1), 0]);
-
       macdAxisLeft = d3.svg.axis()
         .scale(macdScale)
         .ticks(3)
@@ -271,15 +268,14 @@ export default Ember.Component.extend({
 
       macdCrosshair = techan.plot.crosshair()
         .xScale(timeAnnotation.axis().scale())
-        .yScale(macdAnnotation.axis().scale())
+        .yScale(macdAnnotationLeft.axis().scale())
         .xAnnotation(timeAnnotation)
-        .yAnnotation([macdAnnotation, macdAnnotationLeft])
+        .yAnnotation([macdAnnotationLeft])
         .verticalWireRange([0, dim.plot.height]);
     }
 
     let rsiScale;
     let rsi;
-    let rsiAxis;
     let rsiAnnotation;
     let rsiAxisLeft;
     let rsiAnnotationLeft;
@@ -295,16 +291,6 @@ export default Ember.Component.extend({
         .xScale(x)
         .yScale(rsiScale);
 
-      rsiAxis = d3.svg.axis()
-        .scale(rsiScale)
-        .ticks(3)
-        .orient("right");
-
-      rsiAnnotation = techan.plot.axisannotation()
-        .axis(rsiAxis)
-        .format(d3.format(',.2fs'))
-        .translate([x(1), 0]);
-
       rsiAxisLeft = d3.svg.axis()
         .scale(rsiScale)
         .ticks(3)
@@ -316,9 +302,9 @@ export default Ember.Component.extend({
 
       rsiCrosshair = techan.plot.crosshair()
         .xScale(timeAnnotation.axis().scale())
-        .yScale(rsiAnnotation.axis().scale())
+        .yScale(rsiAnnotationLeft.axis().scale())
         .xAnnotation(timeAnnotation)
-        .yAnnotation([rsiAnnotation, rsiAnnotationLeft])
+        .yAnnotation([rsiAnnotationLeft])
         .verticalWireRange([0, dim.plot.height]);
     }
 
@@ -326,7 +312,7 @@ export default Ember.Component.extend({
       .xScale(timeAnnotation.axis().scale())
       .yScale(chartAnnotation.axis().scale())
       .xAnnotation(timeAnnotation)
-      .yAnnotation([chartAnnotation, percentAnnotation, volumeAnnotation])
+      .yAnnotation([chartAnnotation, volumeAnnotation])
       .verticalWireRange([0, dim.plot.height]);
 
     let svg = this.get('svg');
@@ -369,7 +355,7 @@ export default Ember.Component.extend({
 
     chartSelection.append("g")
       .attr("class", "axis")
-      .attr("transform", "translate(" + x(1) + ",0)")
+      .attr("transform", "translate(" + x(0) + ",0)")
       .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", -12)
@@ -488,9 +474,15 @@ export default Ember.Component.extend({
     svg.select("g." + chartType).datum(data).call(chart);
     svg.select("g.close.annotation").datum([data[data.length - 1]]).call(closeAnnotation);
     svg.select("g.volume").datum(data).call(volume);
-    svg.select("g.sma.ma-0").datum(techan.indicator.sma().period(10)(data)).call(sma0);
-    svg.select("g.sma.ma-1").datum(techan.indicator.sma().period(20)(data)).call(sma1);
-    svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(50)(data)).call(ema2);
+    if (isSma0) {
+      svg.select("g.sma.ma-0").datum(techan.indicator.sma().period(10)(data)).call(sma0);
+    }
+    if (isSma1) {
+      svg.select("g.sma.ma-1").datum(techan.indicator.sma().period(20)(data)).call(sma1);
+    }
+    if (isEma2) {
+      svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(50)(data)).call(ema2);
+    }
     isMacd ? svg.select("g.macd .indicator-plot").datum(macdData).call(macd) : null;
     isRsi ? svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi) : null;
 
@@ -520,7 +512,6 @@ export default Ember.Component.extend({
       svg.select("g.x.axis").call(xAxis);
       svg.select("g.chart .axis").call(yAxis);
       svg.select("g.volume.axis").call(volumeAxis);
-      svg.select("g.percent.axis").call(percentAxis);
 
       // We know the data does not change, a simple refresh that does not perform data joins will suffice.
 
@@ -529,7 +520,6 @@ export default Ember.Component.extend({
       }
 
       if (isMacd) {
-        svg.select("g.macd .axis.right").call(macdAxis);
         svg.select("g.macd .axis.left").call(macdAxisLeft);
 
         svg.select("g.macd .indicator-plot").call(macd.refresh);
@@ -537,7 +527,6 @@ export default Ember.Component.extend({
       }
 
       if (isRsi) {
-        svg.select("g.rsi .axis.right").call(rsiAxis);
         svg.select("g.rsi .axis.left").call(rsiAxisLeft);
 
         svg.select("g.rsi .indicator-plot").call(rsi.refresh);
@@ -547,9 +536,15 @@ export default Ember.Component.extend({
       svg.select("g." + chartType).call(chart.refresh);
       svg.select("g.close.annotation").call(closeAnnotation.refresh);
       svg.select("g.volume").call(volume.refresh);
-      svg.select("g .sma.ma-0").call(sma0.refresh);
-      svg.select("g .sma.ma-1").call(sma1.refresh);
-      svg.select("g .ema.ma-2").call(ema2.refresh);
+      if (isSma0) {
+        svg.select("g .sma.ma-0").call(sma0.refresh);
+      }
+      if (isSma1) {
+        svg.select("g .sma.ma-1").call(sma1.refresh);
+      }
+      if (isEma2) {
+        svg.select("g .ema.ma-2").call(ema2.refresh);
+      }
       svg.select("g.crosshair.chart").call(chartCrosshair.refresh);
     }
   }
