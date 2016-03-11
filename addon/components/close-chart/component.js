@@ -1,3 +1,4 @@
+/* globals d3,techan */
 import Ember from 'ember';
 import BaseChart from '../../base-chart';
 import layout from './template';
@@ -11,8 +12,6 @@ export default BaseChart.extend({
   }),
   didInsertElement() {
     this._super(...arguments);
-    const parseDate = this.get('parseDate');
-    const margin = this.get('margin');
     const svg = this.get('svg');
     const x = this.get('x');
     const y = this.get('y');

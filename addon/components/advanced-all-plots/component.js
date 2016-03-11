@@ -1,3 +1,4 @@
+/* globals d3,techan */
 import Ember from 'ember';
 import layout from './template';
 
@@ -89,7 +90,7 @@ export default Ember.Component.extend({
     this._super(...arguments);
 
     if (!this.get('currentUrl')) {
-      throw new Error('Required argument missed: currentUrl')
+      throw new Error('Required argument missed: currentUrl');
     }
 
     this.set('identificator', 'plot-' + Math.floor(Math.random() * (9000000 - 1000000) + 1000000));
@@ -97,7 +98,6 @@ export default Ember.Component.extend({
   refreshChartHeight() {
     const dim = this.get('dim');
     const allIndicators = this.get('allIndicators');
-    const enabledIndicators = this.get('enabledIndicators');
     const fullIndeicatorHeight = dim.indicator.height + dim.indicator.padding;
     let i = 0;
     for (let indicatorName in allIndicators) {
@@ -129,7 +129,7 @@ export default Ember.Component.extend({
         this.get('svg').attr('width', width);
         this.sendAction('redraw');
       }, 150));
-    }
+    };
     Ember.$(window).on('resize', this.updatePlotWidth);
     this.updatePlotWidth();
   },
@@ -139,7 +139,7 @@ export default Ember.Component.extend({
     this.updatePlotWidth = null;
   },
   isIndicatorEnable(indicatorName) {
-    return $.inArray(indicatorName, this.get('enabledIndicators')) !== -1;
+    return Ember.$.inArray(indicatorName, this.get('enabledIndicators')) !== -1;
   },
   getClipUrl(clipId) {
     return "url(" + this.get('currentUrl') + "#" + clipId + ")";
@@ -243,13 +243,12 @@ export default Ember.Component.extend({
 
     let macdScale;
     let macd;
-    let macdAnnotation;
     let macdAxisLeft;
     let macdAnnotationLeft;
     let macdCrosshair;
 
     if (isMacd) {
-      const indicatorIndex = $.inArray('macd', this.get('enabledIndicators'));
+      const indicatorIndex = Ember.$.inArray('macd', this.get('enabledIndicators'));
       macdScale = d3.scale.linear()
         .range([indicatorTop(indicatorIndex) + dim.indicator.height, indicatorTop(indicatorIndex)]);
 
@@ -276,13 +275,12 @@ export default Ember.Component.extend({
 
     let rsiScale;
     let rsi;
-    let rsiAnnotation;
     let rsiAxisLeft;
     let rsiAnnotationLeft;
     let rsiCrosshair;
 
     if (isRsi) {
-      const indicatorIndex = $.inArray('rsi', this.get('enabledIndicators'));
+      const indicatorIndex = Ember.$.inArray('rsi', this.get('enabledIndicators'));
       //  macdScale.copy()
       rsiScale = d3.scale.linear()
         .range([indicatorTop(indicatorIndex) + dim.indicator.height, indicatorTop(indicatorIndex)]);
@@ -418,8 +416,12 @@ export default Ember.Component.extend({
     svg.append('g')
       .attr("class", "crosshair chart");
 
-    isMacd ? svg.append('g').attr("class", "crosshair macd") : null;
-    isRsi ? svg.append('g').attr("class", "crosshair rsi") : null;
+    if (isMacd) {
+      svg.append('g').attr("class", "crosshair macd");
+    }
+    if (isRsi) {
+      svg.append('g').attr("class", "crosshair rsi");
+    }
 
     d3.select(this.get('resetSelector')).on("click", reset);
 
@@ -483,12 +485,20 @@ export default Ember.Component.extend({
     if (isEma2) {
       svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(50)(data)).call(ema2);
     }
-    isMacd ? svg.select("g.macd .indicator-plot").datum(macdData).call(macd) : null;
-    isRsi ? svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi) : null;
+    if (isMacd) {
+      svg.select("g.macd .indicator-plot").datum(macdData).call(macd);
+    }
+    if (isRsi) {
+      svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
+    }
 
     svg.select("g.crosshair.chart").call(chartCrosshair).call(zoom);
-    isMacd ? svg.select("g.crosshair.macd").call(macdCrosshair).call(zoom) : null;
-    isRsi ? svg.select("g.crosshair.rsi").call(rsiCrosshair).call(zoom) : null;
+    if (isMacd) {
+      svg.select("g.crosshair.macd").call(macdCrosshair).call(zoom);
+    }
+    if (isRsi) {
+      svg.select("g.crosshair.rsi").call(rsiCrosshair).call(zoom);
+    }
 
     const zoomable = x.zoomable();
     zoomable.domain([indicatorPreRoll, data.length]); // Zoom in a little to hide indicator preroll

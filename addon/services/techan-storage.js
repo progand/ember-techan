@@ -16,7 +16,7 @@ export default Ember.Service.extend(Ember.Evented, {
 
     items.forEach((item) => {
       data.push(item);
-    })
+    });
     this.set('data', data);
     this.trigger('newItem');
   }

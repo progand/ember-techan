@@ -1,3 +1,4 @@
+/* globals d3,techan */
 import Ember from 'ember';
 import layout from './template';
 /* d3 global */
@@ -250,7 +251,7 @@ export default Ember.Component.extend({
   }),
   init() {
     this._super(...arguments);
-    this.set('identificator', 'plot-' + Math.floor(Math.random() * (9000000 - 1000000) + 1000000))
+    this.set('identificator', 'plot-' + Math.floor(Math.random() * (9000000 - 1000000) + 1000000));
   },
 
   didInsertElement() {

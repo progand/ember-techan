@@ -1,3 +1,4 @@
+/* globals d3,techan */
 import Ember from 'ember';
 import layout from './template';
 import BaseChart from '../../base-chart';
@@ -34,7 +35,6 @@ export default BaseChart.extend({
       .translate([0, this.get('height')]);
   }),
   crosshair: Ember.computed(function() {
-    const self = this;
     return techan.plot.crosshair()
       .xScale(this.get('x'))
       .yScale(this.get('y'))
@@ -90,7 +90,7 @@ export default BaseChart.extend({
       y.domain(techan.scale.plot.ohlc(dataFromStore, accessor).domain());
       yVolume.domain(techan.scale.plot.volume(dataFromStore).domain());
 
-      this.send('redraw')
+      this.send('redraw');
     });
     const predefinedData = this.get('data');
     if (predefinedData instanceof Array || predefinedData.length > 0) {
@@ -102,7 +102,7 @@ export default BaseChart.extend({
           low: +item.low,
           close: +item.close,
           volume: +item.volume
-        }
+        };
       })
       );
     }

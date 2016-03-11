@@ -1,3 +1,4 @@
+/* globals d3,techan */
 import Ember from 'ember';
 
 export default Ember.Component.extend({
