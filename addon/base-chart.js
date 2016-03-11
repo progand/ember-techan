@@ -62,18 +62,5 @@ export default Ember.Component.extend({
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     this.set('svg', svg);
-    
-    this.set('plot$El',this.$('svg'));
-    this.updatePlotWidth = _.bind(_.throttle(function () {
-      this.get('plot$El').attr('width', this.$().width());
-    }, 150), this);
-    Ember.$(window).on('resize', this.updatePlotWidth);
-    this.updatePlotWidth();
-  },
-  willDestroyElement() {
-    this._super(...arguments);
-    Ember.$(window).off('resize', this.updatePlotWidth);
-    this.updatePlotWidth = null;
-    this.set('plot$El', null);
   }
 });
