@@ -165,7 +165,7 @@ export default Ember.Component.extend({
     const indicatorTop = d3.scale.linear()
       .range([dim.indicator.top, dim.indicator.bottom]);
 
-    const parseDate = d3.time.format("%d-%b-%y").parse;
+    const parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
     const zoom = d3.behavior.zoom()
       .on("zoom", draw);
